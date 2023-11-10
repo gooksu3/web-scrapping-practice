@@ -1,11 +1,12 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from docx import Document
-from tkinter import Tk,Frame,Label,Button
-from tkinter.ttk import Combobox
+from tkinter import Tk,Frame,Label,Button,font
+from tkinter.ttk import Combobox,Style
 from datetime import datetime
 import os
 import tkinter.messagebox as msgbox
+
 
 date=datetime.now()
 year=date.year
@@ -118,8 +119,16 @@ def get_pilot_plans_on_word(from_time,to_time):
                 results.append(dict_plans)
         os.system(modify_word_file(results))
 
+def label_font(size,weight):
+    return font.Font(size=size,weight=weight)
+
 root=Tk()
+
+style=Style(root)
+style.theme_use("vista")
+
 root.title("도선예보 출력")
+root.configure(background="#E3E3E3")
 list_times=[]
 for i in range(25):
     if i>hour:
@@ -127,32 +136,38 @@ for i in range(25):
         if len(hour_in_list_time)<2:
             hour_in_list_time="0"+hour_in_list_time
         list_times.append(f"{hour_in_list_time}:00")
-frame_to_set_time=Frame(root)
-frame_to_set_time.grid(row=0,column=0)
-frame_date=Frame(frame_to_set_time)
+frame_name=Frame(root,background="#E3E3E3")
+frame_name.grid(row=0,column=0)
+label_name=Label(frame_name,text="도선예보 출력(워드파일)",font=label_font(20,"bold"),background="#E3E3E3")
+label_name.grid(row=0,column=0,pady=20)
+label_explanation=Label(frame_name,text="1. 시작시간과 종료시간을 설정\n2. 출력 버튼을 클릭!!\n3. 워드파일이 나오면 인쇄\n4. 인쇄 후 워드파일 반드시 종료\n5. 프로그램 종료\n(※재인쇄 시 재시작 필요)",font=label_font(12,"normal"),justify="left",background="#FCFCFC",highlightbackground="#010101",highlightthickness=1)
+label_explanation.grid(row=1,column=0,pady=10)
+frame_to_set_time=Frame(root,background="white",highlightbackground="#F90001",highlightthickness=1)
+frame_to_set_time.grid(row=1,column=0)
+frame_date=Frame(frame_to_set_time,background="white")
 frame_date.grid(row=0,column=0)
-label_date=Label(frame_date,text=f"{month}월{day}일")
+label_date=Label(frame_date,text=f"{year}년{month}월{day}일",font=label_font(15,"bold"),background="white",fg="#010101")
 label_date.grid(row=0,column=0)
-frame_time=Frame(frame_to_set_time)
-frame_time.grid(row=1,column=0)
-label_from=Label(frame_time,text="From")
+frame_time=Frame(frame_to_set_time,background="white")
+frame_time.grid(row=1,column=0,padx=10,pady=5)
+label_from=Label(frame_time,text="From",font=label_font(13,"bold"),fg="#010101",background="white")
 label_from.grid(row=0,column=0)
-combo_from_time=Combobox(frame_time,width=6,value=list_times)
+combo_from_time=Combobox(frame_time,width=6,value=list_times,font=label_font(13,"bold"))
 combo_from_time.grid(row=0,column=1)
 if "06:00" in list_times:
     combo_from_time.current("06:00")
-label_to=Label(frame_time,text="to")
+label_to=Label(frame_time,text="to",font=label_font(13,"bold"),fg="#010101",background="white")
 label_to.grid(row=0,column=2)
-combo_to_time=Combobox(frame_time,width=6,value=list_times)
+combo_to_time=Combobox(frame_time,width=6,value=list_times,font=label_font(13,"bold"))
 combo_to_time.grid(row=0,column=3)
 if combo_from_time.get()!="":
     combo_to_time.current("09:00")
-frame_btns=Frame(root)
-frame_btns.grid(row=1,column=0)
-btn_to_create_word=Button(frame_btns, text="출력",width=4)
-btn_to_create_word.grid(row=0,column=0,padx=3,pady=3)
-btn_to_end=Button(frame_btns, text="종료",command=root.quit,width=4)
-btn_to_end.grid(row=0,column=1,padx=3,pady=3)
+frame_btns=Frame(root,background="#E3E3E3")
+frame_btns.grid(row=2,column=0,pady=10)
+btn_to_create_word=Button(frame_btns, text="출  력",width=8,font=label_font(12,"bold"),background="#EBEBEB")
+btn_to_create_word.grid(row=0,column=0,padx=10,pady=3)
+btn_to_end=Button(frame_btns, text="종  료",command=root.quit,width=8,font=label_font(12,"bold"),background="#EBEBEB")
+btn_to_end.grid(row=0,column=1,padx=10,pady=3)
 btn_to_create_word.configure(command=lambda:get_pilot_plans_on_word(combo_from_time.get(),combo_to_time.get()))
 
 root.mainloop()
